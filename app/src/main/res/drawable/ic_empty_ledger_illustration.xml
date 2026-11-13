@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="200dp"
+    android:height="150dp"
+    android:viewportWidth="200"
+    android:viewportHeight="150">
+    <!-- Soft warm circle backdrop -->
+    <path
+        android:fillColor="#FEF3C7"
+        android:pathData="M45,75a55,55 0 1,0 110,0a55,55 0 1,0 -110,0" />
+    <!-- Open register pages -->
+    <path
+        android:fillColor="#0F2942"
+        android:pathData="M46,38h108c4.4,0 8,3.6 8,8v64c0,4.4 -3.6,8 -8,8H46c-4.4,0 -8,-3.6 -8,-8V46c0,-4.4 3.6,-8 8,-8z" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M50,42h48v64H50zM102,42h48v64h-48z" />
+    <!-- Left page lines (Emerald receivable) -->
+    <path
+        android:fillColor="#10B981"
+        android:pathData="M56,52h24v5H56zM56,64h34v4H56zM56,74h28v4H56zM56,84h36v4H56z" />
+    <!-- Right page lines (Ruby payable) -->
+    <path
+        android:fillColor="#F43F5E"
+        android:pathData="M108,52h24v5h-24zM108,64h34v4h-34zM108,74h28v4h-28zM108,84h36v4h-36z" />
+    <!-- Gold bookmark -->
+    <path
+        android:fillColor="#F59E0B"
+        android:pathData="M96,36h8v28l-4,-4l-4,4z" />
+</vector>

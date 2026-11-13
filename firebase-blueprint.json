@@ -1,0 +1,168 @@
+{
+  "entities": {
+    "Party": {
+      "title": "Party",
+      "description": "A customer or supplier account in the shop register tracking credit given, payments/credit received, and net balance.",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "The UID of the authenticated shop owner."
+        },
+        "name": {
+          "type": "string",
+          "description": "Full name or business name of the customer or supplier."
+        },
+        "phone": {
+          "type": "string",
+          "description": "Optional phone number for contact or reminders."
+        },
+        "role": {
+          "type": "string",
+          "enum": ["CUSTOMER", "SUPPLIER", "BOTH"],
+          "description": "Classification of the party in the shop register."
+        },
+        "notes": {
+          "type": "string",
+          "description": "Additional notes, address, or credit terms for this party."
+        },
+        "totalGivenCents": {
+          "type": "integer",
+          "description": "Total amount in cents that the shop gave or sold on credit to this party."
+        },
+        "totalGotCents": {
+          "type": "integer",
+          "description": "Total amount in cents that the shop received or bought on credit from this party."
+        },
+        "netBalanceCents": {
+          "type": "integer",
+          "description": "Net balance in cents (totalGivenCents - totalGotCents). Positive means party owes the shop; negative means shop owes the party."
+        },
+        "entryCount": {
+          "type": "integer",
+          "description": "Total count of transaction entries recorded for this party."
+        },
+        "lastActivitySummary": {
+          "type": "string",
+          "description": "Short summary of the most recent transaction entry."
+        },
+        "dueDateMillis": {
+          "type": "integer",
+          "description": "Optional due date timestamp in epoch milliseconds for settlement reminder (0 if unset)."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp when the party record was created (FieldValue.serverTimestamp())."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp when the party record was last updated (FieldValue.serverTimestamp())."
+        }
+      },
+      "required": [
+        "userId",
+        "name",
+        "phone",
+        "role",
+        "notes",
+        "totalGivenCents",
+        "totalGotCents",
+        "netBalanceCents",
+        "entryCount",
+        "lastActivitySummary",
+        "dueDateMillis",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "LedgerEntry": {
+      "title": "LedgerEntry",
+      "description": "An individual credit or payment transaction entry associated with a party in the shop register.",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "The UID of the authenticated shop owner."
+        },
+        "partyId": {
+          "type": "string",
+          "description": "The document ID of the Party this entry belongs to."
+        },
+        "partyName": {
+          "type": "string",
+          "description": "Denormalized name of the Party for display in global register views."
+        },
+        "type": {
+          "type": "string",
+          "enum": ["GAVE", "GOT"],
+          "description": "GAVE means shop gave money/goods on credit (they owe us); GOT means shop received money/goods on credit (we owe them)."
+        },
+        "amountCents": {
+          "type": "integer",
+          "description": "Transaction amount in cents (must be positive)."
+        },
+        "description": {
+          "type": "string",
+          "description": "Detailed itemization or note for the transaction entry."
+        },
+        "category": {
+          "type": "string",
+          "description": "Category label such as Goods Sold, Cash Received, Stock Purchase, Bill Payment, or Advance."
+        },
+        "paymentMode": {
+          "type": "string",
+          "enum": ["CASH", "BANK_TRANSFER", "UPI_WALLET", "CREDIT", "CHEQUE"],
+          "description": "Payment or credit instrument used for this entry."
+        },
+        "referenceNote": {
+          "type": "string",
+          "description": "Optional invoice, bill, or receipt reference number."
+        },
+        "entryDateMillis": {
+          "type": "integer",
+          "description": "Transaction date and time in epoch milliseconds."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp when the entry was created (FieldValue.serverTimestamp())."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp when the entry was last updated (FieldValue.serverTimestamp())."
+        }
+      },
+      "required": [
+        "userId",
+        "partyId",
+        "partyName",
+        "type",
+        "amountCents",
+        "description",
+        "category",
+        "paymentMode",
+        "referenceNote",
+        "entryDateMillis",
+        "createdAt",
+        "updatedAt"
+      ]
+    }
+  },
+  "firestore": {
+    "/users/{userId}/parties/{partyId}": {
+      "schema": {
+        "$ref": "#/entities/Party"
+      },
+      "description": "Stores customer and supplier accounts owned by a specific user."
+    },
+    "/users/{userId}/entries/{entryId}": {
+      "schema": {
+        "$ref": "#/entities/LedgerEntry"
+      },
+      "description": "Stores detailed transaction ledger entries for parties owned by a specific user."
+    }
+  }
+}

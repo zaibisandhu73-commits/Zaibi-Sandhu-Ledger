@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="320dp"
+    android:height="160dp"
+    android:viewportWidth="320"
+    android:viewportHeight="160">
+    <!-- Light SaaS Workspace Background -->
+    <path
+        android:fillColor="#EEF2FF"
+        android:pathData="M0,0h320v160h-320z" />
+    <!-- Subtle Geometric Grid Accent Circles -->
+    <path
+        android:fillColor="#E0E7FF"
+        android:pathData="M265,30m-56,0a56,56 0,1 1,112 0a56,56 0,1 1,-112 0" />
+    <path
+        android:fillColor="#ECFDF5"
+        android:pathData="M52,135m-48,0a48,48 0,1 1,96 0a48,48 0,1 1,-96 0" />
+    <!-- Central SaaS Dashboard Card Shadow/Border -->
+    <path
+        android:fillColor="#CBD5E1"
+        android:pathData="M62,25h196c6.6,0 12,5.4 12,12v96c0,6.6 -5.4,12 -12,12H62c-6.6,0 -12,-5.4 -12,-12V37c0,-6.6 5.4,-12 12,-12z" />
+    <!-- Central SaaS Dashboard White Card -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M62,23h196c6.6,0 12,5.4 12,12v96c0,6.6 -5.4,12 -12,12H62c-6.6,0 -12,-5.4 -12,-12V35c0,-6.6 5.4,-12 12,-12z" />
+    <!-- Indigo Header Bar inside Card -->
+    <path
+        android:fillColor="#4F46E5"
+        android:pathData="M62,23h196c6.6,0 12,5.4 12,12v8H50v-8c0,-6.6 5.4,-12 12,-12z" />
+    <!-- Left Page Lines -->
+    <path
+        android:fillColor="#E2E8F0"
+        android:pathData="M68,54h68v6H68zM68,68h52v5H68zM68,80h64v5H68zM68,92h44v5H68zM68,106h60v5H68z" />
+    <!-- Center Spine Divider -->
+    <path
+        android:fillColor="#E2E8F0"
+        android:pathData="M159,43h2v98h-2z" />
+    <!-- Right Page Receivable Pill (Emerald) -->
+    <path
+        android:fillColor="#ECFDF5"
+        android:pathData="M174,52h74c3.3,0 6,2.7 6,6v20c0,3.3 -2.7,6 -6,6h-74c-3.3,0 -6,-2.7 -6,-6V58c0,-3.3 2.7,-6 6,-6z" />
+    <path
+        android:fillColor="#059669"
+        android:pathData="M178,61h42v6h-42zM178,71h26v5h-26z" />
+    <!-- Right Page Payable Pill (Rose) -->
+    <path
+        android:fillColor="#FFF1F2"
+        android:pathData="M174,92h74c3.3,0 6,2.7 6,6v20c0,3.3 -2.7,6 -6,6h-74c-3.3,0 -6,-2.7 -6,-6V98c0,-3.3 2.7,-6 6,-6z" />
+    <path
+        android:fillColor="#E11D48"
+        android:pathData="M178,101h38v6h-38zM178,111h24v5h-24z" />
+</vector>

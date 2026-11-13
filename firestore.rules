@@ -1,0 +1,149 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Global safety net: deny all access by default
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Reusable primitive helpers
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() >= 1 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    // Validation Blueprint: Party
+    function isValidParty(data, userId) {
+      return data.keys().hasAll([
+               'userId', 'name', 'phone', 'role', 'notes',
+               'totalGivenCents', 'totalGotCents', 'netBalanceCents',
+               'entryCount', 'lastActivitySummary', 'dueDateMillis',
+               'createdAt', 'updatedAt'
+             ]) &&
+             data.keys().hasOnly([
+               'userId', 'name', 'phone', 'role', 'notes',
+               'totalGivenCents', 'totalGotCents', 'netBalanceCents',
+               'entryCount', 'lastActivitySummary', 'dueDateMillis',
+               'createdAt', 'updatedAt'
+             ]) &&
+             data.userId is string && data.userId == userId && data.userId == request.auth.uid && data.userId.size() <= 128 &&
+             data.name is string && data.name.size() >= 1 && data.name.size() <= 100 &&
+             data.phone is string && data.phone.size() <= 30 &&
+             data.role is string && (data.role == 'CUSTOMER' || data.role == 'SUPPLIER' || data.role == 'BOTH') &&
+             data.notes is string && data.notes.size() <= 300 &&
+             data.totalGivenCents is int && data.totalGivenCents >= 0 &&
+             data.totalGotCents is int && data.totalGotCents >= 0 &&
+             data.netBalanceCents is int && data.netBalanceCents == (data.totalGivenCents - data.totalGotCents) &&
+             data.entryCount is int && data.entryCount >= 0 &&
+             data.lastActivitySummary is string && data.lastActivitySummary.size() <= 150 &&
+             data.dueDateMillis is int && data.dueDateMillis >= 0 &&
+             data.createdAt is timestamp && data.createdAt <= request.time &&
+             data.updatedAt is timestamp && data.updatedAt <= request.time;
+    }
+
+    // Validation Blueprint: LedgerEntry
+    function isValidLedgerEntry(data, userId) {
+      return data.keys().hasAll([
+               'userId', 'partyId', 'partyName', 'type', 'amountCents',
+               'description', 'category', 'paymentMode', 'referenceNote',
+               'entryDateMillis', 'createdAt', 'updatedAt'
+             ]) &&
+             data.keys().hasOnly([
+               'userId', 'partyId', 'partyName', 'type', 'amountCents',
+               'description', 'category', 'paymentMode', 'referenceNote',
+               'entryDateMillis', 'createdAt', 'updatedAt'
+             ]) &&
+             data.userId is string && data.userId == userId && data.userId == request.auth.uid && data.userId.size() <= 128 &&
+             isValidId(data.partyId) &&
+             data.partyName is string && data.partyName.size() >= 1 && data.partyName.size() <= 100 &&
+             data.type is string && (data.type == 'GAVE' || data.type == 'GOT') &&
+             data.amountCents is int && data.amountCents > 0 && data.amountCents <= 100000000000 &&
+             data.description is string && data.description.size() >= 1 && data.description.size() <= 300 &&
+             data.category is string && data.category.size() >= 1 && data.category.size() <= 50 &&
+             data.paymentMode is string && (
+               data.paymentMode == 'CASH' ||
+               data.paymentMode == 'BANK_TRANSFER' ||
+               data.paymentMode == 'UPI_WALLET' ||
+               data.paymentMode == 'CREDIT' ||
+               data.paymentMode == 'CHEQUE'
+             ) &&
+             data.referenceNote is string && data.referenceNote.size() <= 100 &&
+             data.entryDateMillis is int && data.entryDateMillis > 0 &&
+             data.createdAt is timestamp && data.createdAt <= request.time &&
+             data.updatedAt is timestamp && data.updatedAt <= request.time;
+    }
+
+    // Parties Collection Rules
+    match /users/{userId}/parties/{partyId} {
+      allow get: if isOwner(userId) && isValidId(userId) && isValidId(partyId);
+      allow list: if isOwner(userId);
+
+      allow create: if isOwner(userId) &&
+                       isValidId(userId) &&
+                       isValidId(partyId) &&
+                       isValidParty(incoming(), userId);
+
+      allow update: if isOwner(userId) &&
+                       isValidId(userId) &&
+                       isValidId(partyId) &&
+                       isValidParty(incoming(), userId) &&
+                       incoming().userId == existing().userId &&
+                       incoming().createdAt == existing().createdAt &&
+                       incoming().diff(existing()).affectedKeys().hasOnly([
+                         'name', 'phone', 'role', 'notes',
+                         'totalGivenCents', 'totalGotCents', 'netBalanceCents',
+                         'entryCount', 'lastActivitySummary', 'dueDateMillis',
+                         'updatedAt'
+                       ]);
+
+      allow delete: if isOwner(userId) && isValidId(userId) && isValidId(partyId);
+    }
+
+    // Ledger Entries Collection Rules
+    match /users/{userId}/entries/{entryId} {
+      allow get: if isOwner(userId) && isValidId(userId) && isValidId(entryId);
+      allow list: if isOwner(userId);
+
+      allow create: if isOwner(userId) &&
+                       isValidId(userId) &&
+                       isValidId(entryId) &&
+                       isValidLedgerEntry(incoming(), userId) &&
+                       (
+                         exists(/databases/$(database)/documents/users/$(userId)/parties/$(incoming().partyId)) ||
+                         existsAfter(/databases/$(database)/documents/users/$(userId)/parties/$(incoming().partyId))
+                       );
+
+      allow update: if isOwner(userId) &&
+                       isValidId(userId) &&
+                       isValidId(entryId) &&
+                       isValidLedgerEntry(incoming(), userId) &&
+                       incoming().userId == existing().userId &&
+                       incoming().partyId == existing().partyId &&
+                       incoming().createdAt == existing().createdAt &&
+                       incoming().diff(existing()).affectedKeys().hasOnly([
+                         'partyName', 'type', 'amountCents', 'description',
+                         'category', 'paymentMode', 'referenceNote',
+                         'entryDateMillis', 'updatedAt'
+                       ]);
+
+      allow delete: if isOwner(userId) && isValidId(userId) && isValidId(entryId);
+    }
+  }
+}

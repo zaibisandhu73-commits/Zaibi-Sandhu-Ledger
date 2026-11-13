@@ -1,0 +1,6 @@
+{
+  "name": "Ledger",
+  "description": "Digital shop and personal ledger for tracking receivables, payables, and detailed entries.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
